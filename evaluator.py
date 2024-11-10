@@ -10,7 +10,6 @@ def evalFunction():
 
 	z = 1
 	invalidGuesses = 0
-
 	for puzzle in puzzles:
 		shuffledPuzzle = shufflePuzzles(puzzle)
 

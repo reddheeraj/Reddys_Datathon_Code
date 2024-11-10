@@ -3,15 +3,17 @@ import os
 from dotenv import load_dotenv
 import re
 import itertools
+import requests
+import ollama
 load_dotenv()
 
 class LLMLayer:
     def __init__(self):
-        self.groq_api_key = "key"
+        self.groq_api_key = "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"
         # self.groq_api_key = os.getenv("GROQ_API_KEY")
         self.client = Groq(api_key=self.groq_api_key)
 
-    def generate_initial_groups(self, words, isOneAway, previousGuesses, strikes, error):
+    def generate_initial_groups(self, words, isOneAway, previousGuesses, strikes, error, wasCorrect):
         """
         Generate initial groups using LLM suggestions based on associations.
         """
@@ -26,16 +28,19 @@ class LLMLayer:
             prompt +=f"\nThis was your previous guess:{previousGuess}. "
             if isOneAway:
                 prompt += "\nYour previous guess was are one word away from the correct answer. Change one word in your previous guess to get the correct answer."
-            else:
+            if wasCorrect == 1:
+                prompt += "\nYour previous guess was correct."
+            elif wasCorrect == -1:
                 prompt += "\nYour previous guess was wrong."
-            # previousGuesses = [', '.join(guess) for guess in previousGuesses]
-            # previousGuesses = '\n'.join(previousGuesses)
-            # print(previousGuesses)
-            # prompt += f"\nThese are your previous guesses: \n{previousGuesses}. Do not repeat these combinations in your output.\n"
-        prompt +="""
-            ONLY OUTPUT THE WORDS. DO NOT SAY intro sentences like "here are the words". Just present the words in groups. You should ONLY respond in lines and each line should contain 4 words(not more or not less) separated by a comma and a whitespace. 
-            Do not include a comma at the end of the line.\n VERY IMPORTANT: You should output ALL the words into groups.
-            VERY IMPORTANT (Example format for input and output):
+            previousGuesses = [', '.join(guess) for guess in previousGuesses]
+            previousGuesses = '\n'.join(previousGuesses)
+            print(previousGuesses)
+            prompt += f"\nThese are your previous guesses: \n{previousGuesses}. Do not repeat these combinations in your output.\n"
+        prompt +=f"""
+            ONLY OUTPUT THE WORDS. DO NOT SAY intro sentences like "here are the words". You should ONLY respond in lines and each line should contain 4 words(not more or not less) separated by a comma and a whitespace. 
+            VERY IMPORTANT: You should output ONLY the {len(words)} words into groups. DO NOT USE any other words.
+            Your output should contain EXACTLY {len(words)//4} lines.
+            (Example format for input and output):
             INPUT:
             ['TWISTED', 'EXPONENT', 'THRONE', 'REST', 'WARPED', 'TRACE', 'BENT', 'OUNCE', 'ROOT', 'GNARLY', 'RADICAL', 'POWDER', 'SHRED', 'LICK', 'POWER', 'BATH']
 
@@ -45,20 +50,22 @@ class LLMLayer:
             THRONE, REST, BATH, POWDER
             OUNCE, TRACE, LICK, SHRED
         """
+        prompt = str(prompt)
         while True:
             try:
-                chat_completion = self.client.chat.completions.create(
-                    messages=[{"role": "user", "content": prompt}],
-                    model="llama3-70b-8192",
-                    temperature=0.5,
-                    max_tokens=50
-                )
-                response = chat_completion.choices[0].message.content
+                
+                response = ollama.chat(model = 'llama3.1', messages=[{'role': 'user', 'content': prompt}])
+                if 'message' in response.keys():
+                    if 'content' in response['message'].keys():
+                        response = response['message']['content']
+                else:
+                    continue
                 print("response: ", response)
                 # Parse response to form groups
                 initial_groups, check = self.parse_response_to_groups(response, len(words))
                 if check == True:
-                    break
+                    
+                    return initial_groups
                 else:
                     continue
             except Exception as e:
@@ -73,6 +80,7 @@ class LLMLayer:
         # Example parsing logic:
         try:
             lines = response.strip().splitlines()
+            lines = [line.strip() for line in lines if line and not line.startswith("Here")]
             words = [word for line in lines for word in re.split(r',\s*', line.strip(", "))]
             # words = set(words)
             print("words: ", words)
@@ -92,23 +100,15 @@ class LLMLayer:
         """
 
         # Format the group as a prompt for LLM validation
-        prompt = f"Are the following words a logically grouped set? {group}. Respond with 'Yes' or 'No'."
+        prompt = f"Are the following words a logically grouped set? Consider semantic, complex, homophones, palindromes etc type of reasoning. {group}.VERY IMPORTANT: Respond with ONLY a 'Yes' or a 'No'. Do not include any other information in your response."
         # global client
         try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are an assistant that validates word groupings."},
-                    {"role": "user", "content": prompt}
-                ],
-                model="llama3-70b-8192",
-                temperature=0.5,
-                max_tokens=10,
-                top_p=1
-            )
-            # Get the response from LLM
-            response = chat_completion.choices[0].message.content.strip().lower()
+            response = ollama.chat(model = 'llama3.1', messages=[{'role': 'user', 'content': prompt}])
+            if 'message' in response.keys():
+                    if 'content' in response['message'].keys():
+                        response = response['message']['content']
             print('validation: ', response)
-            is_valid = "yes" in response  # Check if LLM responded positively
+            is_valid = "yes" in response or "Yes" in response # Check if LLM responded positively
             return is_valid, group
         except Exception as e:
             print("Error during LLM validation:", e)
@@ -120,21 +120,13 @@ class LLMLayer:
         """
 
         # Format the group as a prompt for scoring based on similarity or thematic strength
-        prompt = f"On a scale from 1 to 10, how well do these words belong together? Only give the score. group : {group}"
+        prompt = f"On a scale from 1 to 10, how well do these words belong together? Consider semantic, complex, homophones, palindromes etc type of reasoning. VERY IMPORTANT: Output only the score without any other information. Group : {group}"
         try:
             # print(self.groq_api_key)
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are an assistant that scores the thematic coherence of word groups."},
-                    {"role": "user", "content": prompt}
-                ],
-                model="llama3-70b-8192",
-                temperature=0.5,
-                max_tokens=10,
-                top_p=1
-            )
-            # Parse the score from the LLM response
-            response = chat_completion.choices[0].message.content.strip()
+            response = ollama.chat(model = 'llama3.1', messages=[{'role': 'user', 'content': prompt}])
+            if 'message' in response.keys():
+                    if 'content' in response['message'].keys():
+                        response = response['message']['content']
             print('score: ', response)
             try:
                 score = int(response)

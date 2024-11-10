@@ -4,13 +4,14 @@ from .llm_layer import LLMLayer
 MAX_RETRIES = 6  # Maximum attempts for re-evaluation of groups
 
 class GroupingManager:
-    def __init__(self, words, isOneAway, previousGuesses, strikes, error):
+    def __init__(self, words, isOneAway, previousGuesses, strikes, error, wasCorrect):
         self.words = words
         self.nlp_layer = NLPLayer()
         
         self.invalid_words = set()  # Track invalid words from flagged groups
         self.retries = 0  # Counter for re-evaluation attempts
         self.isOneAway = isOneAway
+        self.wasCorrect = wasCorrect
         self.previousGuesses = previousGuesses
         self.strikes = strikes
         self.error = error
@@ -21,7 +22,7 @@ class GroupingManager:
         Generate and evaluate groups using the NLP and LLM layers. If the LLM layer detects an invalid group,
         it triggers re-evaluation with filtered candidate groups.
         """
-        initial_groups = self.llm_layer.generate_initial_groups(self.words, self.isOneAway, self.previousGuesses, self.strikes, self.error)
+        initial_groups = self.llm_layer.generate_initial_groups(self.words, self.isOneAway, self.previousGuesses, self.strikes, self.error, self.wasCorrect)
         print("Initial groups:", initial_groups)
         refined_groups = self.nlp_layer.refine_groups(initial_groups)
         # print('------>',candidate_groups)
@@ -32,7 +33,7 @@ class GroupingManager:
             # Validate the group using LLM
             is_valid, validated_group = self.llm_layer.validate_group_with_llm(group)
             print("Validated group:", validated_group)
-            
+            print("is valid: ", is_valid)
             if is_valid:
                 print("is valid: ", validated_group)
                 return validated_group, False  # Return the validated group, do not end turn

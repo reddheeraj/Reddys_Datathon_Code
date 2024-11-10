@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-
+prev_len = 0
 
 def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 	"""
@@ -26,21 +26,29 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 	endTurn - Boolean if you want to end the puzzle
 	_______________________________________________________
 	"""
-
+	global prev_len
 	# Your Code here
 	# Good Luck!
 	print("correctGroups in starter_code.py:", correctGroups)
 	words = ast.literal_eval(words)
+	wasCorrect = -1
+	if len(correctGroups)>prev_len:
+		wasCorrect = 1
+	elif len(correctGroups) == 0 and len(previousGuesses) == 0:
+		wasCorrect = 0
 	if len(correctGroups) > 0:
 		# remove corrected groups from words
+		wasCorrect = 1
 		for group in correctGroups:
 			for word in group:
-				words.remove(word)
+				if word in words:
+					words.remove(word)
+	prev_len = len(correctGroups)
 	if len(words) == 4:
 		return words, True
-				
 	
-	grouping_manager = GroupingManager(words, isOneAway, previousGuesses, strikes, error)
+	
+	grouping_manager = GroupingManager(words, isOneAway, previousGuesses,strikes, error, wasCorrect)
 
     # Create a Block to handle NLP and LLM processing
 	block = Block()
