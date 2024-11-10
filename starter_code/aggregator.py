@@ -5,8 +5,8 @@ class Aggregator:
     def resolve_groups(self, group_candidates, previous_guesses, strikes, is_one_away, correctGroups):
         # Aggregate candidates from each block
         candidate_groups = []
-        for candidates in group_candidates:
-            for group in candidates:
+        print("Group candidates:", group_candidates)
+        for group in group_candidates:
                 if group not in previous_guesses and group not in correctGroups:
                     candidate_groups.append(group)
         
