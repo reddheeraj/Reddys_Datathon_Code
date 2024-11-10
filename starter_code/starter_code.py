@@ -5,7 +5,7 @@ import os
 import ast
 from .grouping_manager import GroupingManager
 from dotenv import load_dotenv
-
+import time
 
 load_dotenv()
 prev_len = 0
@@ -36,6 +36,11 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 		wasCorrect = 1
 	elif len(correctGroups) == 0 and len(previousGuesses) == 0:
 		wasCorrect = 0
+	correctSet = {item for sublist in correctGroups for item in sublist}
+	previousGuesses = [
+		guess_list for guess_list in previousGuesses
+    	if not any(item in correctSet for item in guess_list)
+	]
 	if len(correctGroups) > 0:
 		# remove corrected groups from words
 		wasCorrect = 1
@@ -45,7 +50,7 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 					words.remove(word)
 	prev_len = len(correctGroups)
 	if len(words) == 4:
-		return words, True
+		pass
 	
 	
 	grouping_manager = GroupingManager(words, isOneAway, previousGuesses,strikes, error, wasCorrect)
@@ -59,6 +64,8 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 	# Get the best candidate groups from the GroupingManager
 	best_group, endTurn = grouping_manager.get_best_group()
 	print("Best group in starter_code.py:", best_group)
+	if isOneAway:
+		return best_group, False
 	# If we have a valid best group, start processing the next guess
 	if best_group:
 		guess = best_group

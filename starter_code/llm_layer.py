@@ -27,7 +27,7 @@ class LLMLayer:
             previousGuess = ','.join(previousGuess)
             prompt +=f"\nThis was your previous guess:{previousGuess}. "
             if isOneAway:
-                prompt += "\nYour previous guess was are one word away from the correct answer. Change one word in your previous guess to get the correct answer."
+                prompt += "\nYour previous guess was are one word away from the correct answer. Change EXACTLY ONE word(no more or less) in your previous guess to get a correct group."
             if wasCorrect == 1:
                 prompt += "\nYour previous guess was correct."
             elif wasCorrect == -1:
@@ -35,11 +35,15 @@ class LLMLayer:
             previousGuesses = [', '.join(guess) for guess in previousGuesses]
             previousGuesses = '\n'.join(previousGuesses)
             print(previousGuesses)
-            prompt += f"\nThese are your previous guesses: \n{previousGuesses}. Do not repeat these combinations in your output.\n"
+            prompt += f"\nThese are your previous guesses: \n{previousGuesses}. DO NOT consider these combinations.\n"
         prompt +=f"""
-            ONLY OUTPUT THE WORDS. DO NOT SAY intro sentences like "here are the words". You should ONLY respond in lines and each line should contain 4 words(not more or not less) separated by a comma and a whitespace. 
-            VERY IMPORTANT: You should output ONLY the {len(words)} words into groups. DO NOT USE any other words.
-            Your output should contain EXACTLY {len(words)//4} lines.
+            VERY IMPORTANT:Instructions for the output:
+                1. Output only the given words, grouped into lines.
+                2. Each line should contain exactly four words, separated by a comma and a space.
+                3. Do not include any introductory sentences or additional words.
+                4. Use all the provided words; do not add or omit any.
+                5. The output should contain exactly {len(words) // 4} lines.
+                6. Do not include any other text. This is the MOST IMPORTANT INSTRUCTION.
             (Example format for input and output):
             INPUT:
             ['TWISTED', 'EXPONENT', 'THRONE', 'REST', 'WARPED', 'TRACE', 'BENT', 'OUNCE', 'ROOT', 'GNARLY', 'RADICAL', 'POWDER', 'SHRED', 'LICK', 'POWER', 'BATH']
@@ -62,7 +66,7 @@ class LLMLayer:
                     continue
                 print("response: ", response)
                 # Parse response to form groups
-                initial_groups, check = self.parse_response_to_groups(response, len(words))
+                initial_groups, check = self.parse_response_to_groups(response, words)
                 if check == True:
                     
                     return initial_groups
@@ -72,7 +76,7 @@ class LLMLayer:
                 print("Error during initial group generation:", e)
         return initial_groups
 
-    def parse_response_to_groups(self, response, length):
+    def parse_response_to_groups(self, response, words):
         """
         Parse the response to extract groups of 4 words.
         """
@@ -81,17 +85,61 @@ class LLMLayer:
         try:
             lines = response.strip().splitlines()
             lines = [line.strip() for line in lines if line and not line.startswith("Here")]
-            words = [word for line in lines for word in re.split(r',\s*', line.strip(", "))]
+            response_words = [word.strip() for line in lines for word in re.split(r',', line.strip(", "))]
             # words = set(words)
-            print("words: ", words)
-            if len(words) !=length:
+            
+            if len(response_words) < len(words):
+                omitted_words = [word for word in words if word not in response_words]
+                # append only len(words) - len(response_words) words
+                response_words += omitted_words[:len(words) - len(response_words)]
+                # return [response_words[i:i + 4] for i in range(0, len(response_words), 4)], True
+            elif len(response_words) > len(words):
                 return [], False
-            return [words[i:i + 4] for i in range(0, len(words), 4)], True
+            print("words: ", response_words)
+            return [response_words[i:i + 4] for i in range(0, len(response_words), 4)], True
         except Exception as e:
             print("Error parsing response to groups:", e)
             return [], False
         
         # return [group.split(', ') for group in response.splitlines() if len(group.split()) == 4]
+
+    def group_isOneAway(self, words, previousGuesses):
+        previousGuess = previousGuesses[-1]
+        previousGuess = ','.join(previousGuess)
+        remaining_words = [word for word in words if word not in previousGuess]
+        prompt =f"You are one word away from the correct answer! Your previous guess was {previousGuess}. Identify exactly ONE WORD in the remaining list: {remaining_words} and in the previous guess to swap to get the correct group with some complex reasoning. Consider semantic, complex, homophones, palindromes, rhyming etc type of reasoning." 
+        previousGuesses = [', '.join(guess) for guess in previousGuesses]
+        previousGuesses = '\n'.join(previousGuesses)
+        prompt += f"\nThese are your previous guesses: \n{previousGuesses}. DO NOT consider these combinations.\n"
+        prompt +=f"""
+            OUTPUT INSTRUCTIONS:
+            1. Output a single line with 4 words separated by a comma and a space.
+            2. Do not include any introductory sentences or additional words.
+            3. Do not include any other text. This is the MOST IMPORTANT INSTRUCTION.
+
+            Example Output:
+            TWISTED, WARPED, BENT, GNARLY
+        """
+        while(True):
+            try:
+                response = ollama.chat(model = 'llama3.1', messages=[{'role': 'user', 'content': prompt}])
+                if 'message' in response.keys():
+                    if 'content' in response['message'].keys():
+                        response = response['message']['content']
+                else:
+                    continue
+                print("response: ", response)
+                # Parse response to form groups
+                lines = response.strip().splitlines()
+                lines = [line.strip() for line in lines if line and not line.startswith("Here")]
+                response_words = [word.strip() for line in lines for word in re.split(r',', line.strip(", "))]
+                if len(response_words) != 4:
+                    continue
+                else:
+                    return response_words
+            except Exception as e:
+                print("Error parsing response to groups:", e)
+                return []
 
     def validate_group_with_llm(self, group):
         """
