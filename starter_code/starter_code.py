@@ -29,9 +29,18 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 
 	# Your Code here
 	# Good Luck!
+	print("correctGroups in starter_code.py:", correctGroups)
 	words = ast.literal_eval(words)
-
-	grouping_manager = GroupingManager(words)
+	if len(correctGroups) > 0:
+		# remove corrected groups from words
+		for group in correctGroups:
+			for word in group:
+				words.remove(word)
+	if len(words) == 4:
+		return words, True
+				
+	
+	grouping_manager = GroupingManager(words, isOneAway, previousGuesses, strikes, error)
 
     # Create a Block to handle NLP and LLM processing
 	block = Block()
@@ -51,6 +60,8 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 	# print("best_group:", best_group)
 	# Aggregator resolves and selects the best group based on current conditions
 	resolved_group = aggregator.resolve_groups([best_group], previousGuesses, strikes, isOneAway, correctGroups)
+	for i in range(len(resolved_group)):
+		resolved_group[i] = resolved_group[i].replace(',','').strip()
 
 	# If a valid group is resolved, return it
 	if resolved_group:

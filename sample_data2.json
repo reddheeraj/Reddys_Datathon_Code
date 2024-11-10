@@ -1,0 +1,382 @@
+[
+    [
+        {
+            "words": [
+                "Knight",
+                "Flour",
+                "Brake",
+                "Mail"
+            ],
+            "category": "Words that are homophones of other words"
+        },
+        {
+            "words": [
+                "Saddle",
+                "Bit",
+                "Rein",
+                "Hoof"
+            ],
+            "category": "Horse-related equipment"
+        },
+        {
+            "words": [
+                "Wheat",
+                "Sugar",
+                "Yeast",
+                "Egg"
+            ],
+            "category": "Baking ingredients"
+        },
+        {
+            "words": [
+                "Diamond",
+                "Chain",
+                "Plate",
+                "Scale"
+            ],
+            "category": "Types of medieval armor"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Lead",
+                "Bass",
+                "Tear",
+                "Wind"
+            ],
+            "category": "Heteronyms (words spelled the same but pronounced differently)"
+        },
+        {
+            "words": [
+                "Bass",
+                "Drum",
+                "Organ",
+                "Harp"
+            ],
+            "category": "Musical instruments"
+        },
+        {
+            "words": [
+                "Organ",
+                "Heart",
+                "Liver",
+                "Brain"
+            ],
+            "category": "Vital human organs"
+        },
+        {
+            "words": [
+                "Wind",
+                "Storm",
+                "Gale",
+                "Breeze"
+            ],
+            "category": "Types of wind"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Calf",
+                "Kitten",
+                "Pup",
+                "Cub"
+            ],
+            "category": "Names of young animals"
+        },
+        {
+            "words": [
+                "Kid",
+                "Goat",
+                "Ram",
+                "Ewe"
+            ],
+            "category": "Types of sheep and goats"
+        },
+        {
+            "words": [
+                "Ram",
+                "Mouse",
+                "Hard Drive",
+                "Keyboard"
+            ],
+            "category": "Computer hardware components"
+        },
+        {
+            "words": [
+                "Mouse",
+                "Bat",
+                "Crane",
+                "Seal"
+            ],
+            "category": "Words that are both animals and verbs"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Pole",
+                "Park",
+                "Chest",
+                "Box"
+            ],
+            "category": "Words that can precede 'car' to form a compound word"
+        },
+        {
+            "words": [
+                "Chest",
+                "Thigh",
+                "Leg",
+                "Back"
+            ],
+            "category": "Parts of the human body"
+        },
+        {
+            "words": [
+                "Drone",
+                "Tank",
+                "Jet",
+                "Submarine"
+            ],
+            "category": "Military vehicles"
+        },
+        {
+            "words": [
+                "Tank",
+                "Fish",
+                "Water",
+                "Gas"
+            ],
+            "category": "Words commonly paired with 'tank'"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Date",
+                "Palm",
+                "Fig",
+                "Olive"
+            ],
+            "category": "Mediterranean fruits"
+        },
+        {
+            "words": [
+                "Palm",
+                "Head",
+                "Sole",
+                "Face"
+            ],
+            "category": "Body parts"
+        },
+        {
+            "words": [
+                "Face",
+                "Card",
+                "Book",
+                "Value"
+            ],
+            "category": "Words that can follow 'Facebook'"
+        },
+        {
+            "words": [
+                "Card",
+                "Deck",
+                "Shuffle",
+                "Deal"
+            ],
+            "category": "Playing card terms"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Cycle",
+                "Pole",
+                "Trip",
+                "Bell"
+            ],
+            "category": "Words that can precede 'mountain' to form a common term"
+        },
+        {
+            "words": [
+                "Bell",
+                "Armstrong",
+                "Edison",
+                "Ford"
+            ],
+            "category": "Famous inventors"
+        },
+        {
+            "words": [
+                "Ford",
+                "Lincoln",
+                "Carter",
+                "Grant"
+            ],
+            "category": "U.S. Presidents"
+        },
+        {
+            "words": [
+                "Grant",
+                "Award",
+                "Scholarship",
+                "Fellowship"
+            ],
+            "category": "Types of academic funding"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Lettuce",
+                "Turnip",
+                "Pea",
+                "Bean"
+            ],
+            "category": "Vegetables"
+        },
+        {
+            "words": [
+                "Pea",
+                "Princess",
+                "Frog",
+                "Tower"
+            ],
+            "category": "Elements in fairy tales"
+        },
+        {
+            "words": [
+                "Frog",
+                "Crane",
+                "Duck",
+                "Swan"
+            ],
+            "category": "Amphibious or aquatic animals"
+        },
+        {
+            "words": [
+                "Crane",
+                "Lift",
+                "Hoist",
+                "Jack"
+            ],
+            "category": "Lifting equipment"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Light",
+                "Lead",
+                "Second",
+                "Air"
+            ],
+            "category": "Words that can precede 'man' to form a superhero name"
+        },
+        {
+            "words": [
+                "Air",
+                "Water",
+                "Earth",
+                "Fire"
+            ],
+            "category": "Classical elements"
+        },
+        {
+            "words": [
+                "Firefox",
+                "Explorer",
+                "Opera",
+                "Chrome"
+            ],
+            "category": "Web browsers"
+        },
+        {
+            "words": [
+                "DuckDuckGo",
+                "Safari",
+                "Edge",
+                "Brave"
+            ],
+            "category": "Web browsers"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Bark",
+                "Nail",
+                "Saw",
+                "Plane"
+            ],
+            "category": "Carpentry tools"
+        },
+        {
+            "words": [
+                "Plane",
+                "Train",
+                "Boat",
+                "Car"
+            ],
+            "category": "Modes of transportation"
+        },
+        {
+            "words": [
+                "Train",
+                "Dress",
+                "Suit",
+                "Tie"
+            ],
+            "category": "Items of clothing"
+        },
+        {
+            "words": [
+                "Tie",
+                "Match",
+                "Draw",
+                "Even"
+            ],
+            "category": "Terms for equal scores in games"
+        }
+    ],
+    [
+        {
+            "words": [
+                "Sole",
+                "Colonel",
+                "Kernel",
+                "Soul"
+            ],
+            "category": "Homophones with military ranks or body parts"
+        },
+        {
+            "words": [
+                "Colonel",
+                "General",
+                "Captain",
+                "Major"
+            ],
+            "category": "Military ranks"
+        },
+        {
+            "words": [
+                "Major",
+                "Minor",
+                "Augmented",
+                "Diminished"
+            ],
+            "category": "Musical chords"
+        },
+        {
+            "words": [
+                "Soul",
+                "Funk",
+                "Blues",
+                "Jazz"
+            ],
+            "category": "Music genres"
+        }
+    ]
+]

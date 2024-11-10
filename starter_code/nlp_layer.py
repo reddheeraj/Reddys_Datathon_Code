@@ -79,7 +79,7 @@ class NLPLayer:
         refined_groups = []
         for group in initial_groups:
             embeddings = self.get_word_embeddings(group)
-            print("size of embeddings: ", embeddings.shape)
+            # print("size of embeddings: ", embeddings.shape)
             clustering = KMeansConstrained(n_clusters=1, size_min=4, size_max=4, random_state=0)
             cluster_labels = clustering.fit_predict(embeddings)
             if len(set(cluster_labels)) == 1:
