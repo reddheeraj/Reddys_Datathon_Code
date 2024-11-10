@@ -5,7 +5,7 @@ load_dotenv()
 
 class LLMLayer:
     def __init__(self):
-        self.groq_api_key = "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"
+        self.groq_api_key = "key"
         # self.groq_api_key = os.getenv("GROQ_API_KEY")
         self.client = Groq(api_key=self.groq_api_key)
 
