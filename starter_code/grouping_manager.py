@@ -9,16 +9,18 @@ class GroupingManager:
         self.nlp_layer = NLPLayer()
         self.llm_layer = LLMLayer()
         self.invalid_words = set()  # Track invalid words from flagged groups
-        self.retries = 5  # Counter for re-evaluation attempts
+        self.retries = 0  # Counter for re-evaluation attempts
     
     def get_best_group(self):
         """
         Generate and evaluate groups using the NLP and LLM layers. If the LLM layer detects an invalid group,
         it triggers re-evaluation with filtered candidate groups.
         """
-        candidate_groups = self.nlp_layer.get_initial_groups(self.words)
+        initial_groups = self.llm_layer.generate_initial_groups(self.words)
+        print("Initial groups:", initial_groups)
+        refined_groups = self.nlp_layer.refine_groups(initial_groups)
         # print('------>',candidate_groups)
-        for group in candidate_groups:
+        for group in refined_groups:
             if self.retries >= MAX_RETRIES:
                 break
             
@@ -28,20 +30,16 @@ class GroupingManager:
             
             if is_valid:
                 return validated_group, False  # Return the validated group, do not end turn
-            else:
+            
                 # Update invalid words and refine candidate groups
-                self.invalid_words.update(validated_group)
-                candidate_groups = self.nlp_layer.get_initial_groups(self.words)
-                candidate_groups = [g for g in candidate_groups if not any(w in self.invalid_words for w in g)]
-                self.retries += 1  # Increase re-evaluation count
+            self.invalid_words.update(validated_group)
+            refined_groups = [g for g in refined_groups if not any(w in self.invalid_words for w in g)]
+            self.retries += 1  # Increase re-evaluation count
 
         # Fallback to highest scoring group if retries are exhausted
-        scores = []
-        # print("Candidate groups:????", candidate_groups)
-        for group in candidate_groups:
-            # print("Group====:", group)
-            score = self.llm_layer.score_group(group)
-            scores.append(score)
-        # best_group = max(candidate_groups, key=lambda x: self.llm_layer.score_group(x))
-        best_group = candidate_groups[scores.index(max(scores))]
-        return best_group, True  # End turn if retries were exceeded
+        scores = [self.llm_layer.score_group(group) for group in refined_groups]
+        print("refined groups: ", refined_groups)
+        print("scores: ", scores)
+        best_group = refined_groups[scores.index(max(scores))]
+        return best_group, True  # Return the best group, end turn
+

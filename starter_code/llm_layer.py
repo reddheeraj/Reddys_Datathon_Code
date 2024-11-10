@@ -9,6 +9,36 @@ class LLMLayer:
         # self.groq_api_key = os.getenv("GROQ_API_KEY")
         self.client = Groq(api_key=self.groq_api_key)
 
+    def generate_initial_groups(self, words):
+        """
+        Generate initial groups using LLM suggestions based on associations.
+        """
+        initial_groups = []
+        # Call LLM to suggest associations and groupings
+        prompt = f"Suggest the best groups of 4 associated words from the following: {words}. I need you to respond in 4 lines and each line contains 4 words seprated by a comma and a whitespace."
+        try:
+            chat_completion = self.client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama3-70b-8192",
+                temperature=0.5,
+                max_tokens=50
+            )
+            response = chat_completion.choices[0].message.content.strip()
+            print("response: ", response)
+            # Parse response to form groups
+            initial_groups = self.parse_response_to_groups(response)
+        except Exception as e:
+            print("Error during initial group generation:", e)
+        return initial_groups
+
+    def parse_response_to_groups(self, response):
+        """
+        Parse the response to extract groups of 4 words.
+        """
+        # Parse groups based on expected format in response
+        # Example parsing logic:
+        return [group.split(', ') for group in response.splitlines() if len(group.split()) == 4]
+
     def validate_group_with_llm(self, group):
         """
         Send a group of words to the LLM for validation through the Groq API.
@@ -24,7 +54,7 @@ class LLMLayer:
                     {"role": "system", "content": "You are an assistant that validates word groupings."},
                     {"role": "user", "content": prompt}
                 ],
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 temperature=0.5,
                 max_tokens=10,
                 top_p=1
@@ -52,7 +82,7 @@ class LLMLayer:
                     {"role": "system", "content": "You are an assistant that scores the thematic coherence of word groups."},
                     {"role": "user", "content": prompt}
                 ],
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 temperature=0.5,
                 max_tokens=10,
                 top_p=1
