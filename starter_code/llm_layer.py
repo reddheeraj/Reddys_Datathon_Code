@@ -1,30 +1,25 @@
 from groq import Groq
 import os
 from dotenv import load_dotenv
-import time
 load_dotenv()
 
 class LLMLayer:
     def __init__(self):
-        self.groq_api_key = os.getenv("GROQ_API_KEY")
+        self.groq_api_key = "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"
+        # self.groq_api_key = os.getenv("GROQ_API_KEY")
+        self.client = Groq(api_key=self.groq_api_key)
 
-    def create_client(self):
-        """Creates and returns a new Groq client instance."""
-        return Groq(api_key=self.groq_api_key)
-
-    def validate_group_with_llm(self, group, client=None):
+    def validate_group_with_llm(self, group):
         """
         Send a group of words to the LLM for validation through the Groq API.
         Returns whether the LLM validates this group as correct.
         """
 
-        if client is None:
-            client = self.create_client()
         # Format the group as a prompt for LLM validation
         prompt = f"Are the following words a logically grouped set? {group}. Respond with 'Yes' or 'No'."
         # global client
         try:
-            chat_completion = client.chat.completions.create(
+            chat_completion = self.client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": "You are an assistant that validates word groupings."},
                     {"role": "user", "content": prompt}
@@ -43,18 +38,16 @@ class LLMLayer:
             print("Error during LLM validation:", e)
             return False, group
 
-    def score_group(self, group, client=None):
+    def score_group(self, group):
         """
         Assigns a confidence score to a group by querying the LLM to determine the association strength.
         """
-        if client is None:
-            client = self.create_client()
 
         # Format the group as a prompt for scoring based on similarity or thematic strength
         prompt = f"On a scale from 1 to 10, how well do these words belong together? Only give the score. group : {group}"
         try:
             # print(self.groq_api_key)
-            chat_completion = client.chat.completions.create(
+            chat_completion = self.client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": "You are an assistant that scores the thematic coherence of word groups."},
                     {"role": "user", "content": prompt}

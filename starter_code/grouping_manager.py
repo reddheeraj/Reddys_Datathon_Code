@@ -8,8 +8,6 @@ class GroupingManager:
         self.words = words
         self.nlp_layer = NLPLayer()
         self.llm_layer = LLMLayer()
-        self.client = self.llm_layer.create_client()  # Create client once for reuse
-
         self.invalid_words = set()  # Track invalid words from flagged groups
         self.retries = 5  # Counter for re-evaluation attempts
     

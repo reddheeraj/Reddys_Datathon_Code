@@ -41,7 +41,7 @@ def model(words, strikes, isOneAway, correctGroups, previousGuesses, error):
 
 	# Get the best candidate groups from the GroupingManager
 	best_group, endTurn = grouping_manager.get_best_group()
-
+	print("Best group in starter_code.py:", best_group)
 	# If we have a valid best group, start processing the next guess
 	if best_group:
 		guess = best_group
